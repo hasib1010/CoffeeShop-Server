@@ -1,5 +1,5 @@
 const express = require("express");
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const cors = require("cors");
 const app = express();
 const port = process.env.PORT || 5000;
@@ -40,6 +40,41 @@ async function run() {
         app.get('/coffee', async (req, res) => {
             const cursor = coffeeCollection.find();
             const result = await cursor.toArray();
+            res.send(result);
+        })
+        app.get('/coffee/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await coffeeCollection.findOne(query);
+            res.send(result);
+        })
+        app.put("/coffee/:id", async (req, res) => {
+            console.log("updating");
+            const id = req.params.id;
+            const coffee = req.body;
+            const filter = { _id: new ObjectId(id) };
+            const options = {
+                upsert: true
+            }
+            const updateCoffee = {
+                $set: {
+                    chef: coffee.chef,
+                    details: coffee.details,
+                    name: coffee.name,
+                    photo: coffee.photo,
+                    supplier: coffee.supplier,
+                    taste: coffee.taste,
+                    category: coffee.category
+                }
+            };
+            const result = await coffeeCollection.updateOne(filter, updateCoffee, options);
+            res.send(result)
+
+        })
+        app.delete('/coffee/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await coffeeCollection.deleteOne(query);
             res.send(result);
         })
 
