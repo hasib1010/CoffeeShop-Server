@@ -31,6 +31,8 @@ async function run() {
 
         const database = client.db("coffeeDB");
         const coffeeCollection = database.collection("coffeeCollection");
+        const userCollection = database.collection("user");
+
 
         app.post("/coffee", async (req, res) => {
             const newCoffee = req.body;
@@ -69,32 +71,7 @@ async function run() {
             res.send(result)
         })
 
-        // app.put("/coffee/:id", async (req, res) => {
-        //     console.log("updating");
-        //     const id = req.params.id;
-        //     const updateDetails = req.body;
-        //     const filter = { _id: new ObjectId(id) };
-        //     console.log(filter);
-        //     const options = { upsert: true };
-        //     // chef, details, name, photo, supplier, taste, _id, category
-        //     const updateCoffee = {
-        //         $set: {
-        //             chef: updateDetails.chef,
-        //             details: updateDetails.details,
-        //             name: updateDetails.name,
-        //             photo: updateDetails.photo,
-        //             supplier: updateDetails.supplier,
-        //             taste: updateDetails.taste,
-        //             category: updateDetails.category
-        //         }
-        //     };
-
-        //     const result = await coffeeCollection.updateOne(filter, updateCoffee, options);
-        //     console.log(result);
-        //     res.send(result);
-
-
-        // })
+        
         app.delete('/coffee/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) };
@@ -102,6 +79,19 @@ async function run() {
             res.send(result);
         })
 
+        // User Api
+        app.post("/users", async(req, res)=>{
+            const user = req.body;
+            console.log(user);
+            const result = await userCollection.insertOne(user);
+            res.send(result)
+        })
+        app.get("/users", async(req, res)=>{
+            const cursor = userCollection.find();
+            const result = await cursor.toArray();
+            res.send(result)
+        })
+                
     } catch (error) {
         console.error("Error connecting to MongoDB:", error);
     } finally {
