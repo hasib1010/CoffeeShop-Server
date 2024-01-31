@@ -90,6 +90,23 @@ async function run() {
             const cursor = userCollection.find();
             const result = await cursor.toArray();
             res.send(result)
+        });
+        app.delete("/users/:id", async(req, res)=>{
+            const id = req.params.id;
+            const query = {_id: new ObjectId(id)}
+            const result = await userCollection.deleteOne(query);
+            res.send(result);
+        })
+        app.patch("/users", async(req, res)=>{
+            const user = req.body;
+            const filter = {email: user.email }
+            const updateUsers = {
+                $set: {
+                    lastLogin: user.lastLogin
+                }
+            }
+            const result = await userCollection.updateOne(filter, updateUsers)
+            res.send(result)
         })
                 
     } catch (error) {
